@@ -91,8 +91,9 @@ def main():
     with init_empty_weights():
         model = AutoModel.from_pretrained(
             model_path, trust_remote_code=True, 
-            device_map="auto" # 模型不同层会被自动分配到不同GPU上进行计算
-            # device_map={'':torch.cuda.current_device()}
+            # device="cuda",
+            # device_map="auto" # 模型不同层会被自动分配到不同GPU上进行计算
+            device_map={'':torch.cuda.current_device()}
         )
     print(model.hf_device_map)
 
@@ -105,7 +106,10 @@ def main():
     另一个解决办法是下面这个：
     手动把 output_layer 设置为跟 input 一样的 device
     """
-    model.hf_device_map['transformer.output_layer'] = model.hf_device_map['transformer.embedding']
+
+    # print(list(model.hf_device_map['transformer'].keys()))
+
+    # model.hf_device_map['transformer.output_layer'] = model.hf_device_map['transformer.embedding']
     model = AutoModel.from_pretrained("THUDM/chatglm2-6b", trust_remote_code=True, device_map=model.hf_device_map)
     print(model.hf_device_map)
     """
